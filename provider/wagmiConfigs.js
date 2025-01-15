@@ -14,10 +14,12 @@ import {
 import { getDefaultConfig } from "@rainbow-me/rainbowkit";
 import { injected, metaMask, safe, walletConnect } from "wagmi/connectors";
 
-const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
+const projectId = "c87b9758c721b75cf076ef3cc19ddd58"
+
+// const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
 
 export const config = getDefaultConfig({
-  appName: "Airdrop",
+  appName: "Tinseltoken",
   projectId: projectId,
   chains: [bscTestnet],
   ssr: true,
