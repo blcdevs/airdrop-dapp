@@ -149,14 +149,14 @@ const Banner = ({
                           </button>
                         )}
 
-                         {/* Dashboard button - only show if not admin */}
-            {account?.toLowerCase() !== ADMIN?.toLowerCase() && (
-              <Link href="/dashboard" className="btn btn-default btn-radius animation"
-                data-animation="fadeInUp"
-                data-animation-delay="1.45s">
-                Go to Dashboard
-              </Link>
-            )}
+                      {/* Dashboard button - only show if not admin */}
+                    {account?.toLowerCase() !== ADMIN?.toLowerCase() && (
+                      <Link href="/dashboard" className="btn btn-default btn-radius animation"
+                        data-animation="fadeInUp"
+                        data-animation-delay="1.45s">
+                       Dashboard
+                      </Link>
+                    )}
                       </>
                     )}
 

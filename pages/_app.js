@@ -4,6 +4,7 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { Web3Provider } from "../context/Web3Context";
 import { NotificationProvider } from "../context/NotificationContext";
 import "../styles/globals.css";
+import Head from 'next/head'; // Add this import
 
 import { config } from "../provider/wagmiConfigs";
 import Header from "../components/Header";
@@ -17,6 +18,11 @@ const queryClient = new QueryClient();
 function MyApp({ Component, pageProps }) {
   return (
     <>
+    <Head>
+        <link rel="icon" href="/logo.png" />
+        <link rel="shortcut icon" href="/logo.png" />
+      </Head>
+
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider
