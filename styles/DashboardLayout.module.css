@@ -1,0 +1,256 @@
+.dashboardLayout {
+    display: flex;
+    min-height: 100vh;
+    background: #f8f9fa;
+    position: relative;
+  }
+  
+  .sidebar {
+    width: 260px;
+    background: #fff;
+    border-right: 1px solid #e5e7eb;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .sidebarHeader {
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  
+  .userInfo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .avatar {
+    width: 40px;
+    height: 40px;
+    background: #e5e7eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6366f1;
+  }
+  
+  .avatar i {
+    font-size: 1.2rem;
+  }
+  
+  .address {
+    font-size: 0.875rem;
+    color: #4b5563;
+  }
+  
+  .sidebarNav {
+    padding: 1.5rem 0;
+  }
+  
+  .sidebarNav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .navItem {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    color: #4b5563;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .navItem i {
+    width: 20px;
+  }
+  
+  .navItem:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+  }
+  
+  .navItem.active {
+    background: #6366f1;
+    color: white;
+  }
+  
+  .mainContent {
+    flex: 1;
+    padding: 2rem;
+    overflow-y: auto;
+    margin-left: 260px;
+    transition: all 0.3s ease;
+  }
+  
+  .menuToggle {
+    display: none;
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1001;
+    background: #6366f1;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  .loadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: #f8f9fa;
+  }
+  
+  .loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #6366f1;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .comingSoon {
+    text-align: center;
+    padding: 3rem;
+    color: #6b7280;
+  }
+  
+  .comingSoon i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #6366f1;
+  }
+  
+  .comingSoon h2 {
+    margin-bottom: 0.5rem;
+    color: #374151;
+  }
+  
+  .overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+  }
+  
+  @media (max-width: 768px) {
+    .menuToggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  
+    .sidebar {
+      transform: translateX(-100%);
+      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    }
+  
+    .sidebar.open {
+      transform: translateX(0);
+    }
+  
+    .mainContent {
+      margin-left: 0;
+      padding: 1rem;
+      width: 100%;
+    }
+  
+    .sidebarHeader {
+      padding: 1rem;
+    }
+  
+    .navItem {
+      padding: 0.5rem 1rem;
+    }
+  
+    .overlay.show {
+      display: block;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .mainContent {
+      padding: 0.5rem;
+    }
+  
+    .loadingContainer {
+      padding: 1rem;
+    }
+  }
+
+
+  .backLink {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #E0AD6B;
+    text-decoration: none;
+    margin-right: 1rem;
+    transition: all 0.2s;
+  }
+  
+  .backLink:hover {
+    opacity: 0.8;
+  }
+  
+  .backLink i {
+    font-size: 1rem;
+  }
+  
+  .userInfo {
+    display: flex;
+    align-items: center;
+  }
+
+
+  .backLink {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #E0AD6B;
+  text-decoration: none;
+  margin-right: 1rem;
+  transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+}
+
+.backLink:hover {
+  opacity: 0.8;
+}
+
+.backLink i {
+  font-size: 1.2rem;
+}
+
+.userInfo{
+    display: flex;
+    align-items: center;
+    }

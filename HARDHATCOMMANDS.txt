@@ -1,0 +1,39 @@
+BSC Testnet Commands
+
+# 1. Compile contracts
+npx hardhat compile
+
+# 2. Deploy to BSC testnet
+npx hardhat run scripts/deploy.js --network bsctest
+
+# 3. Verify Token contract on BSCScan testnet
+npx hardhat verify --network bsctest DEPLOYED_TOKEN_ADDRESS
+
+# 4. Verify Airdrop contract on BSCScan testnet
+npx hardhat verify --network bsctest DEPLOYED_AIRDROP_ADDRESS \
+"TOKEN_ADDRESS" \
+"START_TIME" \
+"END_TIME" \
+"TNTC Airdrop" \
+"First community airdrop with referral program"
+
+
+
+BSC Mainnet Commands
+# 1. Compile contracts
+npx hardhat compile
+
+# 2. Deploy to BSC mainnet
+
+npx hardhat run scripts/deploy.js --network bsc
+
+# 3. Verify Token contract on BSCScan mainnet
+npx hardhat verify --network bsc DEPLOYED_TOKEN_ADDRESS
+
+# 4. Verify Airdrop contract on BSCScan mainnet
+npx hardhat verify --network bsc DEPLOYED_AIRDROP_ADDRESS \
+"TOKEN_ADDRESS" \
+"START_TIME" \
+"END_TIME" \
+"TNTC Airdrop" \
+"First community airdrop with referral program"
