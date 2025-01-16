@@ -1,26 +1,62 @@
-import {
-  mainnet,
-  polygon,
-  optimism,
-  arbitrum,
-  base,
-  bsc,
-  bscTestnet,
-  holesky,
-  localhost,
-  sepolia,
-  baseSepolia,
-} from "wagmi/chains";
-import { getDefaultConfig } from "@rainbow-me/rainbowkit";
-import { injected, metaMask, safe, walletConnect } from "wagmi/connectors";
+import { createConfig, http } from 'wagmi';
+import {bscTestnet } from 'wagmi/chains';
 
-const projectId = "c87b9758c721b75cf076ef3cc19ddd58"
+import { 
+    rainbowWallet,
+    metaMaskWallet,
+    trustWallet,
+    walletConnectWallet,
+    coinbaseWallet,
+    argentWallet,
+    ledgerWallet,
+    safeWallet,
+    braveWallet,
+    imTokenWallet,
+    injectedWallet,
+    omniWallet,
+} from '@rainbow-me/rainbowkit/wallets';
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 
-// const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID;
+const projectId = 'c87b9758c721b75cf076ef3cc19ddd58'; // Get from https://cloud.walletconnect.com/
 
-export const config = getDefaultConfig({
-  appName: "Tinseltoken",
-  projectId: projectId,
+const connectors = connectorsForWallets(
+  [
+    {
+      groupName: 'Mobile Friendly',
+      wallets: [
+        walletConnectWallet,
+        trustWallet,
+        rainbowWallet,
+        metaMaskWallet,
+      ],
+    },
+    {
+      groupName: 'Other',
+      wallets: [
+        coinbaseWallet,
+        argentWallet,
+        ledgerWallet,
+        safeWallet,
+        braveWallet,
+        imTokenWallet,
+        injectedWallet,
+        omniWallet,
+      ],
+    },
+  ],
+  {
+    projectId,
+    appName: 'Tinseltoken',
+    chains: [bscTestnet], // Prioritize bscTestnet
+    initialChain: bscTestnet.id,
+  }
+);
+
+export const config = createConfig({
+  connectors,
   chains: [bscTestnet],
-  ssr: true,
+  transports: {
+    [bscTestnet.id]: http(),
+
+  },
 });

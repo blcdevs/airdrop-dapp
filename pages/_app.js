@@ -26,6 +26,7 @@ function MyApp({ Component, pageProps }) {
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider
+          
             theme={darkTheme({
               accentColor: "#E0AD6B",
               accentColorForeground: "white",
