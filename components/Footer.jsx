@@ -132,7 +132,7 @@ const Footer = () => {
         <div className="container">
           <div className="row">
             <div className="col-md-6">
-              <p className="copyright">Copyright © 2018 All Rights Reserved.</p>
+              <p className="copyright">Copyright © 2025 All Rights Reserved.</p>
             </div>
             <div className="col-md-6">
               <ul className="list_none footer_menu">

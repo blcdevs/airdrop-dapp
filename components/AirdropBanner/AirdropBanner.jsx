@@ -5,7 +5,7 @@ import { ethers } from "ethers";
 const AirdropBanner = ({ airdropInfo }) => {
   const [displayPercentage, setDisplayPercentage] = useState(0);
   const [tokenStats, setTokenStats] = useState({
-    totalSupply: 1000000,
+    totalSupply: 200000000,
     remainingTokens: 0,
     claimedTokens: 0,
   });

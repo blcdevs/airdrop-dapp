@@ -4,7 +4,9 @@ import "@rainbow-me/rainbowkit/styles.css";
 import { Web3Provider } from "../context/Web3Context";
 import { NotificationProvider } from "../context/NotificationContext";
 import "../styles/globals.css";
-import Head from 'next/head'; // Add this import
+import Head from 'next/head'; 
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';  
 
 import { config } from "../provider/wagmiConfigs";
 import Header from "../components/Header";
@@ -26,7 +28,6 @@ function MyApp({ Component, pageProps }) {
       <WagmiProvider config={config}>
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider
-          
             theme={darkTheme({
               accentColor: "#E0AD6B",
               accentColorForeground: "white",
@@ -38,14 +39,26 @@ function MyApp({ Component, pageProps }) {
             <Web3Provider>
               <NotificationProvider>
                 <div className="min-h-screen bg-[#1A1A1A]">
-                  {/* <MainHeader /> */}
                   <Component {...pageProps} />
                 </div>
+                <ToastContainer
+                  position="top-right"
+                  autoClose={5000}
+                  hideProgressBar={false}
+                  newestOnTop
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                  theme="dark"
+                />
               </NotificationProvider>
             </Web3Provider>
           </RainbowKitProvider>
         </QueryClientProvider>
       </WagmiProvider>
+      
       <script src="assets/js/jquery-1.12.4.min.js"></script>
       <script src="assets/bootstrap/js/bootstrap.min.js"></script>
       <script src="assets/owlcarousel/js/owl.carousel.min.js"></script>
