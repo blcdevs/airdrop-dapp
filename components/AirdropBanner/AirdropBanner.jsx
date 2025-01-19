@@ -39,6 +39,11 @@ const AirdropBanner = ({ airdropInfo }) => {
   return (
     <div className={styles.banner}>
       <div className={styles.container}>
+      <div className={styles.priceContainer}>
+          <span className={styles.priceLabel}>Listing Price:</span>
+          <span className={styles.priceValue}>$1</span>
+        </div>
+        
         <div className={styles.progressContainer}>
           <div className={styles.progressLabels}>
             <span>Sale Raised</span>
