@@ -3,7 +3,7 @@ export const handleTransactionError = (error, showNotification) => {
     
     const errorMessages = {
       ACTION_REJECTED: "Transaction cancelled by user",
-      INSUFFICIENT_FUNDS: "Insufficient BNB for gas fees. Please get BNB from any exchange and try again.",
+      INSUFFICIENT_FUNDS: "Insufficient BNB for gas fees. Please get BNB from any exchange and try again...",
       NETWORK_ERROR: "Network error. Please check your connection and try again.",
       UNPREDICTABLE_GAS_LIMIT: "Transaction cannot be completed. Please try again.",
       CALL_EXCEPTION: "Contract call failed. Please try again.",

@@ -101,7 +101,7 @@ const UserDashboard = ({ activeUser, airdropInfo }) => {
             </div>
 
             {/* Fee Paid Card */}
-            <div className={styles.statCard}>
+            {/* <div className={styles.statCard}>
               <div className={styles.cardIcon}>
                 <i className="fas fa-receipt"></i>
               </div>
@@ -111,7 +111,7 @@ const UserDashboard = ({ activeUser, airdropInfo }) => {
                   {activeUser?.feePaid} BNB
                 </p>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -166,12 +166,12 @@ const UserDashboard = ({ activeUser, airdropInfo }) => {
                     {airdropInfo?.referralBonus} {airdropInfo?.tokenSymbol}
                   </span>
                 </div>
-                <div className={styles.detailRow}>
+                {/* <div className={styles.detailRow}>
                   <span className={styles.label}>Participation Fee</span>
                   <span className={styles.value}>
                     {airdropInfo?.feeAmount} BNB
                   </span>
-                </div>
+                </div> */}
               </div>
             </div>
 

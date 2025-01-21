@@ -6,6 +6,8 @@ import { CustomConnectButton } from "./ConnectButton";
 import CountdownTimer from "./CountdownTimer/CountdownTimer";
 import AirdropBanner from "./AirdropBanner/AirdropBanner";
 import UserDetailsModal from "./UserDetailsModal/UserDetailsModal";
+import AddTokenButton from "./AddTokenButton"; 
+
 
 const ADMIN = process.env.NEXT_PUBLIC_ADMIN_ADDRESS;
 
@@ -62,7 +64,7 @@ const Banner = ({
                   data-animation-delay="1.3s"
                 >
                   Tinseltoken (TNTC) is offering a massive airdrop of 140 million tokens (70% of total supply). 
-                  Distribute in December 2024, this airdrop aims to democratize blockchain access and foster global community engagement.
+                  Distribute in January 2025, this airdrop aims to democratize blockchain access and foster global community engagement.
                    Claim your free TNTC tokens through our simple 3-step process!
                 </p>
                 <div
@@ -70,6 +72,7 @@ const Banner = ({
                   data-animation="fadeInUp"
                   data-animation-delay="1.4s"
                 >
+                  {/* {account && <AddTokenButton />} */}
                   <a
                     target="_blank"
                     href="assets/images/roadmap.pdf"
@@ -149,17 +152,19 @@ const Banner = ({
                           </button>
                         )}
 
+
                       {/* Dashboard button - only show if not admin */}
                     {account?.toLowerCase() !== ADMIN?.toLowerCase() && (
                       <Link href="/dashboard" className="btn btn-default btn-radius animation"
                         data-animation="fadeInUp"
                         data-animation-delay="1.45s">
-                       Dashboard
+                       Go To Dashboard
                       </Link>
                     )}
                       </>
                     )}
 
+                    {account && <AddTokenButton />}
                     
 
                     {ADMIN?.toLowerCase() == account?.toLowerCase() && (

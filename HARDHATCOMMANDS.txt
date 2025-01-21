@@ -7,7 +7,7 @@ npx hardhat compile
 npx hardhat run scripts/deploy.js --network bsc
 
 # 3. Verify Token contract on BSCScan testnet
-npx hardhat verify --network bsctest DEPLOYED_TOKEN_ADDRESS
+npx hardhat verify --network bsc 0x4185C73428AFE39d69b44e72E15A3F5D9128F87a 
 
 # 4. Verify Airdrop contract on BSCScan testnet
 npx hardhat verify --network bsctest DEPLOYED_AIRDROP_ADDRESS \
@@ -37,3 +37,6 @@ npx hardhat verify --network bsc DEPLOYED_AIRDROP_ADDRESS \
 "END_TIME" \
 "TNTC Airdrop" \
 "First community airdrop with referral program"
+
+
+140000000

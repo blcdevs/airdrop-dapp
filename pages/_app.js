@@ -23,6 +23,12 @@ function MyApp({ Component, pageProps }) {
     <Head>
         <link rel="icon" href="/logo.png" />
         <link rel="shortcut icon" href="/logo.png" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+  <link rel="stylesheet" href="assets/css/animate.css" />
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/responsive.css" />
+  <link rel="stylesheet" href="assets/css/spop.min.css" />
       </Head>
 
       <WagmiProvider config={config}>

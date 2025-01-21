@@ -70,7 +70,7 @@ const Dashboard = () => {
             airdropAmount: ethers.utils.formatEther(airdropInfo.baseAmount || "0"),
             referralBonus: ethers.utils.formatEther(airdropInfo.referralAmount || "0"),
             feeAmount: ethers.utils.formatEther(airdropInfo.currentFeeAmount || "0"),
-            tokenSymbol: "BNB",
+            tokenSymbol: "TNTC",
           });
 
         } catch (error) {
