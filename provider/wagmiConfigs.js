@@ -1,5 +1,5 @@
 import { createConfig, http } from 'wagmi';
-import {bsc } from 'wagmi/chains';
+import {bscTestnet } from 'wagmi/chains';
 
 import { 
     rainbowWallet,
@@ -47,16 +47,16 @@ const connectors = connectorsForWallets(
   {
     projectId,
     appName: 'Tinseltoken',
-    chains: [bsc], // Prioritize bsc
-    initialChain: bsc.id,
+    chains: [bscTestnet], // Prioritize bscTestnet
+    initialChain: bscTestnet.id,
   }
 );
 
 export const config = createConfig({
   connectors,
-  chains: [bsc],
+  chains: [bscTestnet],
   transports: {
-    [bsc.id]: http(),
+    [bscTestnet.id]: http(),
 
   },
 });

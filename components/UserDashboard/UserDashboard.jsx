@@ -3,11 +3,13 @@ import { ethers } from 'ethers';
 import styles from "./UserDashboard.module.css";
 import { useWeb3 } from "../../context/Web3Context";
 
-const UserDashboard = ({ activeUser, airdropInfo }) => {
-  const { account } = useWeb3();
+const UserDashboard = ({ activeUser, airdropInfo, handleParticipateWithoutReferral }) => {
+  const { account, contract } = useWeb3();
   const [referralLink, setReferralLink] = useState("");
   const [copySuccess, setCopySuccess] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [nextClaimTime, setNextClaimTime] = useState(0);
+  const [canClaim, setCanClaim] = useState(false);
 
   useEffect(() => {
     if (account && typeof window !== 'undefined') {
@@ -15,6 +17,32 @@ const UserDashboard = ({ activeUser, airdropInfo }) => {
       setLoading(false);
     }
   }, [account]);
+
+  useEffect(() => {
+    const checkClaimStatus = async () => {
+      if (contract && account) {
+        const nextTime = await contract.getNextClaimTime(account);
+        setNextClaimTime(Number(nextTime));
+        setCanClaim(Date.now() / 1000 >= Number(nextTime));
+      }
+    };
+
+    checkClaimStatus();
+    const interval = setInterval(checkClaimStatus, 1000);
+    return () => clearInterval(interval);
+  }, [contract, account]);
+
+  const formatTimeLeft = (nextClaimTime) => {
+    const now = Math.floor(Date.now() / 1000);
+    const diff = nextClaimTime - now;
+    if (diff <= 0) return "Ready to claim";
+    
+    const hours = Math.floor(diff / 3600);
+    const minutes = Math.floor((diff % 3600) / 60);
+    const seconds = diff % 60;
+    
+    return `${hours}h ${minutes}m ${seconds}s`;
+  };
 
   const shortenAddress = (address) => {
     if (!address) return "";
@@ -68,9 +96,21 @@ const UserDashboard = ({ activeUser, airdropInfo }) => {
               </div>
               <div className={styles.cardContent}>
                 <h3>Airdrop Status</h3>
-                <p className={`${styles.statusBadge} ${activeUser?.hasParticipated ? styles.active : styles.inactive}`}>
-                  {activeUser?.hasParticipated ? "Participated" : "Not claimed yet"}
-                </p>
+                {activeUser?.hasParticipated && !canClaim ? (
+  <p className={`${styles.statusBadge} ${styles.active}`}>
+    Claimed - Next in: {formatTimeLeft(nextClaimTime)}
+  </p>
+) : (
+  <div className={styles.claimContainer}>
+    <button
+      onClick={handleParticipateWithoutReferral}
+      className={styles.claimButton}
+      disabled={!canClaim}
+    >
+      {canClaim ? "Claim Airdrop" : `Next claim in: ${formatTimeLeft(nextClaimTime)}`}
+    </button>
+  </div>
+)}
               </div>
             </div>
 
@@ -100,18 +140,19 @@ const UserDashboard = ({ activeUser, airdropInfo }) => {
               </div>
             </div>
 
-            {/* Fee Paid Card */}
-            {/* <div className={styles.statCard}>
+            <div className={styles.statCard}>
               <div className={styles.cardIcon}>
-                <i className="fas fa-receipt"></i>
+                <i className="fas fa-coins"></i>
               </div>
               <div className={styles.cardContent}>
-                <h3>Fee Paid</h3>
-                <p className={styles.feePaid}>
-                  {activeUser?.feePaid} BNB
+                <h3>Task Points</h3>
+                <p className={styles.tokenAmount}>
+                {ethers.utils.formatUnits(activeUser?.userPoints || "0", 18)}
                 </p>
               </div>
-            </div> */}
+            </div>
+
+
           </div>
         </div>
 
@@ -166,12 +207,6 @@ const UserDashboard = ({ activeUser, airdropInfo }) => {
                     {airdropInfo?.referralBonus} {airdropInfo?.tokenSymbol}
                   </span>
                 </div>
-                {/* <div className={styles.detailRow}>
-                  <span className={styles.label}>Participation Fee</span>
-                  <span className={styles.value}>
-                    {airdropInfo?.feeAmount} BNB
-                  </span>
-                </div> */}
               </div>
             </div>
 

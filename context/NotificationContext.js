@@ -11,11 +11,11 @@ export function NotificationProvider({ children }) {
     switch (type) {
       case "error":
         if (message.includes("insufficient funds")) {
-          toast.error("Insufficient BNB for gas fees. Please get test BNB from faucet.");
+          toast.error("Insufficient BNB for gas fees. Please get BNB from any exchange.");
         } else if (message.includes("user rejected")) {
           toast.info("Transaction cancelled by user");
         } else if (message.includes("network changed")) {
-          toast.warning("Please connect to BSC Testnet");
+          toast.warning("Please connect to BSC mainnet");
         } else {
           toast.error(formatErrorMessage(message));
         }

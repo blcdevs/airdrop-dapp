@@ -8,7 +8,7 @@ const AddTokenButton = ({ className }) => {
   const tokenAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
   const tokenSymbol = "TNTC";
   const tokenDecimals = 18;
-  const tokenImage = "http://localhost:3000/assets/images/logo.png"; // Optional: Add your token logo URL
+  const tokenImage = "https://thetinseltoken.com/assets/img/logo/logo.png"; // Optional: Add your token logo URL
 
   const addTokenToWallet = async () => {
     try {

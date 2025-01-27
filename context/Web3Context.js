@@ -101,6 +101,45 @@ export function Web3Provider({ children }) {
     }
   };
 
+  const updateClaimCooldown = async (hours) => {
+    try {
+      if (!contract) throw new Error("Contract not initialized");
+      const cooldownInSeconds = hours * 3600; // Convert hours to seconds
+      const tx = await contract.setClaimCooldown(cooldownInSeconds);
+      await tx.wait();
+      return { success: true, message: "Claim cooldown updated successfully" };
+    } catch (error) {
+      console.error("Error updating claim cooldown:", error);
+      return { success: false, message: error.message };
+    }
+  };
+
+
+  const getAllTasks = async () => {
+    try {
+      if (!contract) throw new Error("Contract not initialized");
+      const taskCount = await contract.taskCount();
+      const tasks = [];
+      
+      for (let i = 0; i < taskCount; i++) {
+        const task = await contract.tasks(i);
+        tasks.push({
+          id: i,
+          title: task.title,
+          description: task.description,
+          link: task.link,
+          rewardAmount: task.rewardAmount.toString(),
+          taskType: task.taskType,
+          isActive: task.isActive
+        });
+      }
+      return tasks;
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      return [];
+    }
+  };
+
   const connectWallet = async () => {
     try {
       const injectedConnector = connectors.find((c) => c.id === "injected");
@@ -127,7 +166,9 @@ export function Web3Provider({ children }) {
         updateFeeAmount,
         updateFeeCollector,
         withdrawFees,
-        getFeeDetails
+        getFeeDetails,
+        updateClaimCooldown,
+        getAllTasks, 
       }}
     >
       {children}

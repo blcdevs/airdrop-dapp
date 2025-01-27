@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import { useWeb3 } from "../context/Web3Context";
 import UserDashboard from "../components/UserDashboard/UserDashboard";
+import TaskDashboard from "../components/TaskDashboard/TaskDashboard";
 import styles from '../styles/DashboardLayout.module.css';
 import { ethers } from 'ethers';
-import Link from 'next/link'; 
+import Link from 'next/link';
+import { useNotification } from "../context/NotificationContext";
 
 const Dashboard = () => {
   const router = useRouter();
@@ -12,9 +14,6 @@ const Dashboard = () => {
     account, 
     isConnected, 
     contract,
-    checkUserStatus,
-    getUserParticipationInfo,
-    getAirdropInfo
   } = useWeb3();
   
   const [activeMenu, setActiveMenu] = useState('dashboard');
@@ -22,6 +21,7 @@ const Dashboard = () => {
   const [userData, setUserData] = useState(null);
   const [airdropData, setAirdropData] = useState(null);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { showNotification } = useNotification();
 
   useEffect(() => {
     if (!isConnected) {
@@ -35,36 +35,20 @@ const Dashboard = () => {
         try {
           setLoading(true);
           
+          // Get user participation info
           const userInfo = await contract.getUserParticipationInfo(account);
+          const userPoints = await contract.userTaskPoints(account);
           
-          let referrals = [];
-          try {
-            if (userInfo.referrals_) {
-              referrals = userInfo.referrals_;
-            }
-          } catch (error) {
-            console.log("No referrals array in contract");
-          }
-
-          let transactions = [];
-          try {
-            if (userInfo.transactions_) {
-              transactions = userInfo.transactions_;
-            }
-          } catch (error) {
-            console.log("No transactions array in contract");
-          }
-
           setUserData({
             hasParticipated: userInfo.hasParticipated_,
             referralCount: Number(userInfo.referralCount_),
             referrer: userInfo.referrer_,
             totalEarned: ethers.utils.formatEther(userInfo.totalEarned || "0"),
             feePaid: ethers.utils.formatEther(userInfo.feePaid_ || "0"),
-            referrals: referrals,
-            transactions: transactions
+            userPoints: userPoints
           });
 
+          // Get airdrop info
           const airdropInfo = await contract.getAirdropInfo();
           setAirdropData({
             airdropAmount: ethers.utils.formatEther(airdropInfo.baseAmount || "0"),
@@ -84,56 +68,66 @@ const Dashboard = () => {
     loadDashboardData();
   }, [contract, account]);
 
-  const shortenAddress = (address) => {
-    if (!address) return "";
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  const handlePointsUpdate = async () => {
+    if (contract && account) {
+      try {
+        const userInfo = await contract.getUserParticipationInfo(account);
+        setUserData(async prevData => ({
+          ...prevData,
+          totalEarned: ethers.utils.formatEther(userInfo.totalEarned),
+          userPoints: Number(await contract.userTaskPoints(account))
+        }));
+      } catch (error) {
+        console.error("Error updating points:", error);
+      }
+    }
   };
 
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
+  const handleParticipateWithoutReferral = async () => {
+    try {
+      showNotification("Processing...", "info");
+      const tx = await contract.participateWithoutReferral({ 
+        value: ethers.utils.parseEther(airdropData?.feeAmount || "0") 
+      });
+      await tx.wait();
+      
+      // Refresh data after successful participation
+      const userInfo = await contract.getUserParticipationInfo(account);
+      const userPoints = await contract.userTaskPoints(account);
+      
+      setUserData({
+        hasParticipated: userInfo.hasParticipated_,
+        referralCount: Number(userInfo.referralCount_),
+        referrer: userInfo.referrer_,
+        totalEarned: ethers.utils.formatEther(userInfo.totalEarned || "0"),
+        feePaid: ethers.utils.formatEther(userInfo.feePaid_ || "0"),
+        userPoints: userPoints
+      });
+
+      showNotification("You have successfully participated!", "success");
+    } catch (error) {
+      console.error("Error:", error);
+      showNotification(error.message, "error");
+    }
   };
-
-  if (!isConnected) {
-    return null;
-  }
-
-  if (loading) {
-    return (
-      <div className={styles.loadingContainer}>
-        <div className={styles.loader}></div>
-        <p>Loading dashboard...</p>
-      </div>
-    );
-  }
 
   return (
     <div className={styles.dashboardLayout}>
-      <button 
-        className={styles.menuToggle}
-        onClick={toggleMobileMenu}
-      >
-        <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
-      </button>
-
-      <div 
-        className={`${styles.overlay} ${isMobileMenuOpen ? styles.show : ''}`}
-        onClick={() => setIsMobileMenuOpen(false)}
-      />
-
-      <div className={`${styles.sidebar} ${isMobileMenuOpen ? styles.open : ''}`}>
-        <div className={styles.sidebarHeader}>
-          <div className={styles.userInfo}>
-            <div className={styles.avatar}>
-            <Link href="/" className={styles.backLink}>
-              <i className="fas fa-arrow-left"></i>
-            </Link>
-            </div>
-            <span className={styles.address}>{shortenAddress(account)}</span>
+      <div className={styles.sidebar}>
+        <nav>
+          <div className={styles.mobileMenuButton} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+            <i className="fas fa-bars"></i>
           </div>
-        </div>
+          <ul className={`${styles.navList} ${isMobileMenuOpen ? styles.mobileOpen : ''}`}>
+            <li 
+              className={styles.navItem}
+            >
+              <i className="fas fa-home"></i>
+              <Link href="/">
+                Back Home
+              </Link>
+            </li>
 
-        <nav className={styles.sidebarNav}>
-          <ul>
             <li 
               className={`${styles.navItem} ${activeMenu === 'dashboard' ? styles.active : ''}`}
               onClick={() => setActiveMenu('dashboard')}
@@ -157,14 +151,14 @@ const Dashboard = () => {
           <UserDashboard 
             activeUser={userData}
             airdropInfo={airdropData}
+            handleParticipateWithoutReferral={handleParticipateWithoutReferral}
           />
         )}
         {activeMenu === 'tasks' && (
-          <div className={styles.comingSoon}>
-            <i className="fas fa-clock"></i>
-            <h2>Tasks Coming Soon</h2>
-            <p>This feature is under development</p>
-          </div>
+          <TaskDashboard 
+            userPoints={userData?.userPoints || 0}
+            onPointsUpdate={handlePointsUpdate}
+          />
         )}
       </div>
     </div>

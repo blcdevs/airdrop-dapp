@@ -33,7 +33,7 @@ function notification() {
       template:
         '<div class="sale_notification d-flex align-items-center"><img src="assets/images/wc_icon3.png" alt="" /> <div class="notification_inner"> <h3>' +
         Math.floor(Math.random() * 60000 + 3000) +
-        ' TNTC</h3><p>AirDrop Calimed  <img src="/logo.png" alt="" /></p></div></div>',
+        ' TNTC</h3><p>AirDrop Claimed  <img src="/logo.png" alt="" /></p></div></div>',
       group: "submit-satus",
       style: "nav-fixed",
       position: "bottom-left",

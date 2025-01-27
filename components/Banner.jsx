@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from 'next/link'; 
-
+import { useWeb3 } from "../context/Web3Context";
 import { CustomConnectButton } from "./ConnectButton";
 import CountdownTimer from "./CountdownTimer/CountdownTimer";
 import AirdropBanner from "./AirdropBanner/AirdropBanner";
 import UserDetailsModal from "./UserDetailsModal/UserDetailsModal";
 import AddTokenButton from "./AddTokenButton"; 
-
 
 const ADMIN = process.env.NEXT_PUBLIC_ADMIN_ADDRESS;
 
@@ -22,8 +21,10 @@ const Banner = ({
 }) => {
   const router = useRouter();
   const [isReferral, setIsReferral] = useState(false);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [nextClaimTime, setNextClaimTime] = useState(0);
+  const [canClaim, setCanClaim] = useState(false);
+  const { contract } = useWeb3();
 
   useEffect(() => {
     // Check if we're in the browser and URL contains ref parameter
@@ -39,7 +40,45 @@ const Banner = ({
     }
   }, [router.query]);
 
-  console.log(airdropInfo);
+  useEffect(() => {
+    const checkClaimStatus = async () => {
+      if (contract && account) {
+        const nextTime = await contract.getNextClaimTime(account);
+        setNextClaimTime(Number(nextTime));
+        setCanClaim(Date.now() / 1000 >= Number(nextTime));
+      }
+    };
+
+    checkClaimStatus();
+    const interval = setInterval(checkClaimStatus, 1000);
+    return () => clearInterval(interval);
+  }, [contract, account]);
+
+  const formatTimeLeft = (nextClaimTime) => {
+    const now = Math.floor(Date.now() / 1000);
+    const diff = nextClaimTime - now;
+    if (diff <= 0) return "Ready";
+    
+    const hours = Math.floor(diff / 3600);
+    const minutes = Math.floor((diff % 3600) / 60);
+    const seconds = diff % 60;
+    
+    return `${hours}h ${minutes}m ${seconds}s`;
+  };
+
+  const handleClaimClick = () => {
+    if (!canClaim) {
+      const timeLeft = formatTimeLeft(nextClaimTime);
+      alert(`Please wait ${timeLeft} before claiming again`);
+      return;
+    }
+    if (isReferral) {
+      handleParticipate();
+    } else {
+      handleParticipateWithoutReferral();
+    }
+  };
+
   return (
     <>
       <section
@@ -72,7 +111,6 @@ const Banner = ({
                   data-animation="fadeInUp"
                   data-animation-delay="1.4s"
                 >
-                  {/* {account && <AddTokenButton />} */}
                   <a
                     target="_blank"
                     href="assets/images/roadmap.pdf"
@@ -80,15 +118,6 @@ const Banner = ({
                   >
                     Whitepaper
                   </a>
-
-                 
-
-               {/* {account && (
-                   <Link href="/dashboard" className="btn btn-default btn-radius">
-                   Profile / Tasks
-                 </Link>
-                  )} */}
-              
 
                   {account && (
                     <button
@@ -98,7 +127,6 @@ const Banner = ({
                       Referral
                     </button>
                   )}
-
                 </div>
               </div>
             </div>
@@ -124,52 +152,44 @@ const Banner = ({
                       <CustomConnectButton />
                     ) : (
                       <>
-                        {isReferral && !activeUser?.hasParticipated ? (
-                          <button
+                        <button
+                          className="btn btn-default btn-radius animation"
+                          data-animation="fadeInUp"
+                          data-animation-delay="1.40s"
+                          onClick={handleClaimClick}
+                          disabled={!canClaim && activeUser?.hasParticipated}
+                        >
+                          {!activeUser?.hasParticipated 
+                            ? "Claim Airdrop" 
+                            : canClaim 
+                              ? "Claim Again" 
+                              : `Next Claim: ${formatTimeLeft(nextClaimTime)}`
+                          }
+                        </button>
+
+                        {account && (
+                          <Link 
+                            href="/dashboard" 
                             className="btn btn-default btn-radius animation"
                             data-animation="fadeInUp"
-                            data-animation-delay="1.40s"
-                            onClick={() => handleParticipate()}
+                            data-animation-delay="1.45s"
                           >
-                             AirDrop 
-                          </button>
-                        ) : !activeUser?.hasParticipated ? (
-                          <button
-                            className="btn btn-default btn-radius animation"
-                            data-animation="fadeInUp"
-                            data-animation-delay="1.40s"
-                            onClick={() => handleParticipateWithoutReferral()}
-                          >
-                            Claim AirDrop
-                          </button>
-                        ) : (
-                          <button
-                            className="btn btn-default btn-radius animation"
-                            data-animation="fadeInUp"
-                            data-animation-delay="1.40s"
-                          >
-                            AirDrop Claimed Successfully
-                          </button>
+                            Go To Dashboard
+                          </Link>
                         )}
-
-
-                      {/* Dashboard button - only show if not admin */}
-                    {account?.toLowerCase() !== ADMIN?.toLowerCase() && (
-                      <Link href="/dashboard" className="btn btn-default btn-radius animation"
-                        data-animation="fadeInUp"
-                        data-animation-delay="1.45s">
-                       Go To Dashboard
-                      </Link>
-                    )}
                       </>
                     )}
 
                     {account && <AddTokenButton />}
-                    
 
-                    {ADMIN?.toLowerCase() == account?.toLowerCase() && (
-                      <button onClick={() => setIsAdminModalOpen(true)}>
-                        Only Admin
+                    {ADMIN?.toLowerCase() === account?.toLowerCase() && (
+                      <button 
+                        onClick={() => setIsAdminModalOpen(true)}
+                        className="btn btn-default btn-radius animation"
+                        data-animation="fadeInUp"
+                        data-animation-delay="1.50s"
+                      >
+                        Admin Dashboard
                       </button>
                     )}
                   </div>

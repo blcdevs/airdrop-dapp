@@ -362,3 +362,138 @@
   gap: 10px;
   margin-top: 20px;
 }
+
+/* Add these styles to your existing AdminDashboard.module.css */
+
+.tasksManagement {
+  padding: 1.5rem;
+}
+
+.createTask {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.taskForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.taskForm input,
+.taskForm textarea,
+.taskForm select {
+  padding: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+}
+
+.taskForm textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.taskForm button {
+  background: #6366f1;
+  color: white;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.taskForm button:hover {
+  background: #4f46e5;
+}
+
+.tasksList {
+  background: white;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.taskItem {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
+.taskInfo {
+  margin-bottom: 1rem;
+}
+
+.taskInfo h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.taskReward {
+  display: inline-block;
+  background: #ecfdf5;
+  color: #047857;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  margin-top: 0.5rem;
+}
+
+.taskActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.taskActions button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.taskActions button:first-child {
+  background: #6366f1;
+  color: white;
+}
+
+.taskActions button:last-child {
+  background: #ef4444;
+  color: white;
+}
+
+.taskActions button:hover {
+  opacity: 0.9;
+}
+
+.editTaskForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.editActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.editActions button:first-child {
+  background: #10b981;
+  color: white;
+}
+
+.editActions button:last-child {
+  background: #6b7280;
+  color: white;
+}

@@ -31,7 +31,8 @@ const index = () => {
     feeCollector,
     updateFeeAmount,
     updateFeeCollector,
-    withdrawFees 
+    withdrawFees,
+    updateClaimCooldown
   } = useWeb3();
   const { showNotification } = useNotification();
   
@@ -281,6 +282,25 @@ const index = () => {
     }
   };
 
+  const handleUpdateCooldown = async (hours) => {
+    try {
+      setLoading(true);
+      showNotification("Updating claim cooldown...", "info");
+      const result = await updateClaimCooldown(hours);
+      if (result.success) {
+        showNotification(result.message, "success");
+        fetchAirdropDetails();
+      } else {
+        showNotification(result.message, "error");
+      }
+    } catch (error) {
+      showNotification(error.message, "error");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+
   return (
     <div className="bg_light v_light_blue_pro" data-spy="scroll">
       <MainHeader />
@@ -317,6 +337,7 @@ const index = () => {
         onUpdateFeeAmount={handleUpdateFeeAmount}
         onUpdateFeeCollector={handleUpdateFeeCollector}
         onWithdrawFees={handleWithdrawFees}
+        onUpdateCooldown={handleUpdateCooldown} 
       />
     </div>
   );
