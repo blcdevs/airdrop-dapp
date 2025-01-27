@@ -111,9 +111,26 @@ const Dashboard = () => {
     }
   };
 
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
   return (
     <div className={styles.dashboardLayout}>
-      <div className={styles.sidebar}>
+
+<button 
+        className={styles.menuToggle}
+        onClick={toggleMobileMenu}
+      >
+        <i className={`fas ${isMobileMenuOpen ? 'fa-times' : 'fa-bars'}`}></i>
+      </button>
+
+      <div 
+        className={`${styles.overlay} ${isMobileMenuOpen ? styles.show : ''}`}
+        onClick={() => setIsMobileMenuOpen(false)}
+      />
+      
+      <div className={`${styles.sidebar} ${isMobileMenuOpen ? styles.open : ''}`}>
         <nav>
           <div className={styles.mobileMenuButton} onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
             <i className="fas fa-bars"></i>
