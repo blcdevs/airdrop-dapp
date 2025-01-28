@@ -253,3 +253,13 @@
     align-items: flex-start;
   }
 }
+
+.taskLink.waiting {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.taskLink.waiting:hover {
+  background: #9ca3af;
+  transform: none;
+}

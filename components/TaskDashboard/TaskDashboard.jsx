@@ -4,20 +4,44 @@ import styles from "./TaskDashboard.module.css";
 import { ethers } from "ethers";
 import { useNotification } from "../../context/NotificationContext";
 
+// Configuration constants
+const TASK_COMPLETION_DELAY = 2 * 60; // 2 minutes in seconds
+const STORAGE_KEY = 'taskTimers';
+
 const TaskDashboard = ({ userPoints, onPointsUpdate }) => {
-  const { contract, account, getAllTasks } = useWeb3(); // Add getAllTasks from context
+  const { contract, account, getAllTasks } = useWeb3();
   const [tasks, setTasks] = useState([]);
   const [userTaskStatuses, setUserTaskStatuses] = useState({});
   const [loading, setLoading] = useState(true);
+  const [taskTimers, setTaskTimers] = useState(() => {
+    // Initialize from localStorage if available
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        // Only load timers that haven't expired
+        const currentTime = Date.now() / 1000;
+        const validTimers = {};
+        Object.entries(parsed).forEach(([taskId, startTime]) => {
+          if (currentTime - startTime < TASK_COMPLETION_DELAY) {
+            validTimers[taskId] = startTime;
+          }
+        });
+        return validTimers;
+      }
+    }
+    return {};
+  });
+  const [countdowns, setCountdowns] = useState({});
   const { showNotification } = useNotification();
 
-
+  // Load tasks
   useEffect(() => {
     const loadTasks = async () => {
       if (contract) {
         try {
-          const allTasks = await getAllTasks(); // Use getAllTasks from context
-          console.log("Fetched tasks:", allTasks); // Debug log
+          const allTasks = await getAllTasks();
+          console.log("Fetched tasks:", allTasks);
           setTasks(allTasks);
         } catch (error) {
           console.error("Error loading tasks:", error);
@@ -30,6 +54,7 @@ const TaskDashboard = ({ userPoints, onPointsUpdate }) => {
     loadTasks();
   }, [contract, getAllTasks]);
 
+  // Load task statuses
   useEffect(() => {
     const loadTaskStatuses = async () => {
       if (contract && account && tasks.length > 0) {
@@ -49,43 +74,112 @@ const TaskDashboard = ({ userPoints, onPointsUpdate }) => {
     loadTaskStatuses();
   }, [tasks, account, contract]);
 
+  // Persist timers to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(taskTimers));
+    }
+  }, [taskTimers]);
+
+  // Countdown timer effect
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const currentTime = Date.now() / 1000;
+      const newCountdowns = {};
+      
+      Object.entries(taskTimers).forEach(([taskId, startTime]) => {
+        const elapsed = currentTime - startTime;
+        const remaining = TASK_COMPLETION_DELAY - elapsed;
+        
+        if (remaining > 0) {
+          const minutes = Math.floor(remaining / 60);
+          const seconds = Math.floor(remaining % 60);
+          newCountdowns[taskId] = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+        }
+      });
+      
+      setCountdowns(newCountdowns);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [taskTimers]);
+
+  const startTaskTimer = (taskId) => {
+    const startTime = Date.now() / 1000;
+    setTaskTimers(prev => ({
+      ...prev,
+      [taskId]: startTime
+    }));
+  };
+
+  const getTaskStatus = (taskId) => {
+    const startTime = taskTimers[taskId];
+    if (!startTime) return "START";
+
+    const currentTime = Date.now() / 1000;
+    const timeElapsed = currentTime - startTime;
+
+    if (timeElapsed < TASK_COMPLETION_DELAY) {
+      return "WAIT";
+    }
+
+    return "CLAIM";
+  };
+
   const handleTaskClick = async (task) => {
     if (!contract || !account) return;
     if (userTaskStatuses[task.id]?.isCompleted) return;
 
-    try {
-        // Open task link in new tab
+    const status = getTaskStatus(task.id);
+
+    switch (status) {
+      case "START":
+        // Open task link and start timer
         window.open(task.link, '_blank');
+        startTaskTimer(task.id);
+        showNotification(`Complete the task and wait ${TASK_COMPLETION_DELAY / 60} minutes to claim your reward`, "info");
+        break;
 
-        // Complete the task
-        const tx = await contract.completeTask(task.id);
-        console.log("Completing task...", tx);
-        
-        // Wait for transaction confirmation
-        const receipt = await tx.wait();
-        console.log("Task completed:", receipt);
+      case "CLAIM":
+        try {
+          const tx = await contract.completeTask(task.id);
+          showNotification("Claiming reward...", "info");
+          
+          const receipt = await tx.wait();
+          console.log("Task completed:", receipt);
 
-        // Update task status
-        const [isCompleted, completedAt] = await contract.getUserTaskStatus(account, task.id);
-        setUserTaskStatuses(prev => ({
+          // Update task status
+          const [isCompleted, completedAt] = await contract.getUserTaskStatus(account, task.id);
+          setUserTaskStatuses(prev => ({
             ...prev,
             [task.id]: { isCompleted, completedAt: Number(completedAt) }
-        }));
+          }));
 
-        // Refresh user points
-        const points = await contract.userTaskPoints(account);
-        if (onPointsUpdate) {
+          // Clear timer
+          setTaskTimers(prev => {
+            const newTimers = { ...prev };
+            delete newTimers[task.id];
+            return newTimers;
+          });
+
+          // Refresh user points
+          if (onPointsUpdate) {
+            const points = await contract.userTaskPoints(account);
             onPointsUpdate(points);
+          }
+
+          showNotification("Task completed successfully!", "success");
+        } catch (error) {
+          console.error("Error completing task:", error);
+          showNotification("Failed to complete task. Please try again.", "error");
         }
+        break;
 
-        // Show success notification
-        showNotification("Task completed successfully!", "success");
-
-    } catch (error) {
-        console.error("Error completing task:", error);
-        showNotification("Failed to complete task. Please try again.", "error");
+      case "WAIT":
+        showNotification(`Please wait ${countdowns[task.id]} before claiming`, "warning");
+        break;
     }
-};
+  };
 
   const formatDate = (timestamp) => {
     return new Date(timestamp * 1000).toLocaleDateString();
@@ -104,7 +198,7 @@ const TaskDashboard = ({ userPoints, onPointsUpdate }) => {
       <div className={styles.header}>
         <h2>Task Center</h2>
         <div className={styles.userPoints}>
-        <span>Your Points: {ethers.utils.formatUnits(userPoints.toString(), 18) || 0}</span>
+          <span>Your Points: {ethers.utils.formatUnits(userPoints.toString(), 18) || 0}</span>
         </div>
       </div>
 
@@ -124,10 +218,16 @@ const TaskDashboard = ({ userPoints, onPointsUpdate }) => {
               
               <button 
                 onClick={() => handleTaskClick(task)}
-                className={styles.taskLink}
+                className={`${styles.taskLink} ${getTaskStatus(task.id) === "WAIT" ? styles.waiting : ''}`}
                 disabled={userTaskStatuses[task.id]?.isCompleted}
               >
-                {userTaskStatuses[task.id]?.isCompleted ? 'Completed' : 'Complete Task'}
+                {userTaskStatuses[task.id]?.isCompleted 
+                  ? 'Completed' 
+                  : getTaskStatus(task.id) === "START"
+                    ? 'Complete Task'
+                    : getTaskStatus(task.id) === "WAIT"
+                      ? `Wait ${countdowns[task.id]}`
+                      : 'Claim Reward'}
               </button>
 
               <div className={styles.taskFooter}>
