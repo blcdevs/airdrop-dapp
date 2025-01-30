@@ -14,6 +14,25 @@ export const CustomConnectButton = () => {
         const ready = mounted;
         const connected = ready && account && chain;
 
+        const handleConnect = () => {
+          if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            // Check if MetaMask or Trust Wallet is installed
+            const isMetaMaskInstalled = !!window.ethereum?.isMetaMask;
+            const isTrustWalletInstalled = !!window.ethereum?.isTrust;
+
+            if (isMetaMaskInstalled || isTrustWalletInstalled) {
+              // Attempt deep linking
+              setTimeout(openConnectModal, 100);
+            } else {
+              // Fallback to WalletConnect QR code
+              openConnectModal();
+            }
+          } else {
+            // Desktop or non-mobile browser
+            openConnectModal();
+          }
+        };
+
         return (
           <div
             {...(!ready && {
@@ -29,21 +48,7 @@ export const CustomConnectButton = () => {
               if (!connected) {
                 return (
                   <button
-                    onClick={() => {
-                      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                        setTimeout(openConnectModal, 100);
-                        
-                        if (window.ethereum) {
-                          if (window.ethereum.isMetaMask) {
-                            window.ethereum.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
-                          } else if (window.ethereum.isTrust) {
-                            window.location.href = `trust://`;
-                          }
-                        }
-                      } else {
-                        openConnectModal();
-                      }
-                    }}
+                    onClick={handleConnect}
                     className="bg-[#E0AD6B] hover:bg-[#eba447] text-white px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105"
                   >
                     Connect Wallet
