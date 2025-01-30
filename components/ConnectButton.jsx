@@ -1,4 +1,3 @@
-// components/ConnectButton.js
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 export const CustomConnectButton = () => {
@@ -31,12 +30,9 @@ export const CustomConnectButton = () => {
                 return (
                   <button
                     onClick={() => {
-                      // Check if mobile device
                       if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
-                        // Add a small delay for mobile
                         setTimeout(openConnectModal, 100);
                         
-                        // Handle deep linking for specific wallets
                         if (window.ethereum) {
                           if (window.ethereum.isMetaMask) {
                             window.ethereum.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });

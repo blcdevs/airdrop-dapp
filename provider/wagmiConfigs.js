@@ -1,5 +1,3 @@
-// wagmiConfigs.js
-
 import { createConfig, http } from 'wagmi';
 import { bscTestnet } from 'wagmi/chains';
 import { 
@@ -18,18 +16,7 @@ import {
 } from '@rainbow-me/rainbowkit/wallets';
 import { connectorsForWallets } from '@rainbow-me/rainbowkit';
 
-const projectId = 'c87b9758c721b75cf076ef3cc19ddd58';
-
-// Enhanced mobile detection
-const isMobile = typeof window !== 'undefined' && /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
-// Deep linking handlers for different wallets
-const walletDeepLinks = {
-  metamask: (uri) => `metamask://wc?uri=${encodeURIComponent(uri)}`,
-  trust: (uri) => `trust://wc?uri=${encodeURIComponent(uri)}`,
-  rainbow: (uri) => `rainbow://wc?uri=${encodeURIComponent(uri)}`,
-  coinbase: (uri) => `cbwallet://wc?uri=${encodeURIComponent(uri)}`
-};
+const projectId = 'c87b9758c721b75cf076ef3cc19ddd58'; // Get from https://cloud.walletconnect.com/
 
 const walletConnectConfig = {
   projectId,
@@ -43,92 +30,23 @@ const walletConnectConfig = {
   qrModalOptions: {
     themeMode: "dark",
     desktopWallets: true,
-    mobileWallets: true,
-    explorerRecommendedWalletIds: ['metamask', 'trust', 'rainbow']
-  },
-  handleUri: async (uri) => {
-    if (!isMobile) return false;
-
-    // Detect installed wallet
-    const hasMetaMask = typeof window !== 'undefined' && window.ethereum?.isMetaMask;
-    const hasTrust = typeof window !== 'undefined' && window.ethereum?.isTrust;
-    
-    // Try direct injection first if available
-    if (hasMetaMask || hasTrust) {
-      try {
-        await window.ethereum.request({ 
-          method: 'wallet_addEthereumChain', 
-          params: [{
-            chainId: `0x${bscTestnet.id.toString(16)}`,
-            chainName: bscTestnet.name,
-            nativeCurrency: bscTestnet.nativeCurrency,
-            rpcUrls: [bscTestnet.rpcUrls.default.http[0]],
-            blockExplorerUrls: [bscTestnet.blockExplorers.default.url],
-          }]
-        });
-        return true;
-      } catch (e) {
-        console.warn('Failed to add chain:', e);
-      }
-    }
-
-    // Fallback to deep linking
-    let deepLink;
-    if (hasMetaMask) {
-      deepLink = walletDeepLinks.metamask(uri);
-    } else if (hasTrust) {
-      deepLink = walletDeepLinks.trust(uri);
-    } else {
-      // If no wallet detected, try universal links
-      deepLink = `https://metamask.app.link/wc?uri=${encodeURIComponent(uri)}`;
-    }
-
-    if (deepLink) {
-      window.location.href = deepLink;
-      return true;
-    }
-
-    return false;
+    mobileWallets: true
   }
 };
 
-// Prioritize mobile-friendly wallets on mobile
-const getWalletGroups = () => {
-  if (isMobile) {
-    return [
-      {
-        groupName: 'Popular',
-        wallets: [
-          metaMaskWallet,
-          trustWallet,
-          rainbowWallet,
-          walletConnectWallet,
-        ]
-      },
-      {
-        groupName: 'More',
-        wallets: [
-          coinbaseWallet,
-          argentWallet,
-          omniWallet,
-          injectedWallet,
-        ]
-      }
-    ];
-  }
-  
-  return [
+const connectors = connectorsForWallets(
+  [
     {
-      groupName: 'Recommended',
+      groupName: 'Mobile Friendly',
       wallets: [
-        metaMaskWallet,
-        rainbowWallet,
         walletConnectWallet,
         trustWallet,
-      ]
+        rainbowWallet,
+        metaMaskWallet,
+      ],
     },
     {
-      groupName: 'Others',
+      groupName: 'Other',
       wallets: [
         coinbaseWallet,
         argentWallet,
@@ -138,34 +56,51 @@ const getWalletGroups = () => {
         imTokenWallet,
         injectedWallet,
         omniWallet,
-      ]
+      ],
+    },
+  ],
+  {
+    projectId,
+    appName: 'Tinseltoken',
+    chains: [bscTestnet],
+    initialChain: bscTestnet.id,
+    walletConnectOptions: walletConnectConfig,
+    mobileWalletConfig: {
+      enableMobileWalletConnect: true,
+      handleUri: (uri) => {
+        if (typeof window !== 'undefined') {
+          // For MetaMask
+          if (window.ethereum?.isMetaMask) {
+            window.ethereum.request({ 
+              method: 'wallet_addEthereumChain', 
+              params: [{
+                chainId: `0x${bscTestnet.id.toString(16)}`,
+                chainName: bscTestnet.name,
+                nativeCurrency: bscTestnet.nativeCurrency,
+                rpcUrls: [bscTestnet.rpcUrls.default.http[0]],
+                blockExplorerUrls: [bscTestnet.blockExplorers.default.url],
+              }]
+            });
+          }
+          
+          // For Trust Wallet
+          if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+            const encoded = encodeURIComponent(uri);
+            window.location.href = `https://link.trustwallet.com/wc?uri=${encoded}`;
+            return true;
+          }
+        }
+        return false;
+      }
     }
-  ];
-};
+  }
+);
 
-const connectors = connectorsForWallets(getWalletGroups(), {
-  projectId,
-  appName: 'Tinseltoken',
-  chains: [bscTestnet],
-  initialChain: bscTestnet.id,
-  walletConnectOptions: walletConnectConfig
-});
-
-// Handle deep linking redirects
 if (typeof window !== 'undefined') {
   window.addEventListener('load', () => {
-    const url = new URL(window.location.href);
-    const wcUri = url.searchParams.get('wc');
-    if (wcUri) {
-      const uri = decodeURIComponent(wcUri);
-      const hasMetaMask = window.ethereum?.isMetaMask;
-      const hasTrust = window.ethereum?.isTrust;
-      
-      if (hasMetaMask) {
-        window.location.href = walletDeepLinks.metamask(uri);
-      } else if (hasTrust) {
-        window.location.href = walletDeepLinks.trust(uri);
-      }
+    if (window.location.href.includes('wc?uri=')) {
+      const uri = decodeURIComponent(window.location.href.split('wc?uri=')[1]);
+      window.location.href = `trust://wc?uri=${uri}`;
     }
   });
 }
