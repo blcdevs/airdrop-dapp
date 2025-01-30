@@ -30,7 +30,24 @@ export const CustomConnectButton = () => {
               if (!connected) {
                 return (
                   <button
-                    onClick={openConnectModal}
+                    onClick={() => {
+                      // Check if mobile device
+                      if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {
+                        // Add a small delay for mobile
+                        setTimeout(openConnectModal, 100);
+                        
+                        // Handle deep linking for specific wallets
+                        if (window.ethereum) {
+                          if (window.ethereum.isMetaMask) {
+                            window.ethereum.request({ method: 'wallet_requestPermissions', params: [{ eth_accounts: {} }] });
+                          } else if (window.ethereum.isTrust) {
+                            window.location.href = `trust://`;
+                          }
+                        }
+                      } else {
+                        openConnectModal();
+                      }
+                    }}
                     className="bg-[#E0AD6B] hover:bg-[#eba447] text-white px-8 py-3 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105"
                   >
                     Connect Wallet

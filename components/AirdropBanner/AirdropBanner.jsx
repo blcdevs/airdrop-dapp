@@ -45,7 +45,7 @@ const AirdropBanner = ({ airdropInfo }) => {
         </div>
         
         <div className={styles.progressContainer}>
-          <div className={styles.progressLabels}>
+          {/* <div className={styles.progressLabels}>
             <span>Sale Raised</span>
             <span>Total Supply</span>
           </div>
@@ -66,7 +66,7 @@ const AirdropBanner = ({ airdropInfo }) => {
                 {Number(tokenStats.totalSupply).toLocaleString()} Tokens
               </span>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>
