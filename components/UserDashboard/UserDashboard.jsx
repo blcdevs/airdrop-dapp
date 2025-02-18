@@ -122,10 +122,24 @@ const UserDashboard = ({ activeUser, airdropInfo, handleParticipateWithoutReferr
               <div className={styles.cardContent}>
                 <h3>Total Earned</h3>
                 <p className={styles.tokenAmount}>
-                  {activeUser?.totalEarned} {airdropInfo?.tokenSymbol}
+                  {/* {activeUser?.totalEarned} {airdropInfo?.tokenSymbol} */}
+                  {activeUser?.totalEarned || "0"} {airdropInfo?.tokenSymbol}
                 </p>
               </div>
             </div>
+
+            <div className={styles.statCard}>
+              <div className={styles.cardIcon}>
+                <i className="fas fa-hand-holding-usd"></i>
+              </div>
+              <div className={styles.cardContent}>
+                <h3>From Claims</h3>
+                <p className={styles.tokenAmount}>
+                  {Number(activeUser?.claimCount || 0) * Number(airdropInfo?.airdropAmount || 0)} {airdropInfo?.tokenSymbol}
+                </p>
+              </div>
+            </div>
+
 
             {/* Referral Count Card */}
             <div className={styles.statCard}>
@@ -135,7 +149,9 @@ const UserDashboard = ({ activeUser, airdropInfo, handleParticipateWithoutReferr
               <div className={styles.cardContent}>
                 <h3>Referral Count</h3>
                 <p className={styles.referralCount}>
-                  {activeUser?.referralCount || "0"} referrals
+                  {/* {activeUser?.referralCount || "0"} referrals */}
+                {Number(activeUser?.referralCount || 0) * Number(airdropInfo?.referralBonus || 0)} {airdropInfo?.tokenSymbol}
+
                 </p>
               </div>
             </div>

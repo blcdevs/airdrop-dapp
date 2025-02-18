@@ -38,14 +38,16 @@ const Dashboard = () => {
           // Get user participation info
           const userInfo = await contract.getUserParticipationInfo(account);
           const userPoints = await contract.userTaskPoints(account);
+          const claimCount = await contract.userClaimCount(account);
           
           setUserData({
             hasParticipated: userInfo.hasParticipated_,
             referralCount: Number(userInfo.referralCount_),
             referrer: userInfo.referrer_,
-            totalEarned: ethers.utils.formatEther(userInfo.totalEarned || "0"),
+            totalEarned: ethers.utils.formatEther(userInfo.totalEarned),
             feePaid: ethers.utils.formatEther(userInfo.feePaid_ || "0"),
-            userPoints: userPoints
+            userPoints: userPoints,
+            claimCount: Number(claimCount)
           });
 
           // Get airdrop info
