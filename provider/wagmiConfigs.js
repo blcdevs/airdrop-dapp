@@ -1,5 +1,5 @@
 import { createConfig, http } from 'wagmi';
-import { bscTestnet } from 'wagmi/chains';
+import { bsc } from 'wagmi/chains';
 import { 
     rainbowWallet,
     metaMaskWallet,
@@ -62,8 +62,8 @@ const connectors = connectorsForWallets(
   {
     projectId,
     appName: 'Tinseltoken',
-    chains: [bscTestnet],
-    initialChain: bscTestnet.id,
+    chains: [bsc],
+    initialChain: bsc.id,
     walletConnectOptions: walletConnectConfig,
     mobileWalletConfig: {
       enableMobileWalletConnect: true,
@@ -74,11 +74,11 @@ const connectors = connectorsForWallets(
             window.ethereum.request({ 
               method: 'wallet_addEthereumChain', 
               params: [{
-                chainId: `0x${bscTestnet.id.toString(16)}`,
-                chainName: bscTestnet.name,
-                nativeCurrency: bscTestnet.nativeCurrency,
-                rpcUrls: [bscTestnet.rpcUrls.default.http[0]],
-                blockExplorerUrls: [bscTestnet.blockExplorers.default.url],
+                chainId: `0x${bsc.id.toString(16)}`,
+                chainName: bsc.name,
+                nativeCurrency: bsc.nativeCurrency,
+                rpcUrls: [bsc.rpcUrls.default.http[0]],
+                blockExplorerUrls: [bsc.blockExplorers.default.url],
               }]
             });
           }
@@ -107,8 +107,8 @@ if (typeof window !== 'undefined') {
 
 export const config = createConfig({
   connectors,
-  chains: [bscTestnet],
+  chains: [bsc],
   transports: {
-    [bscTestnet.id]: http(),
+    [bsc.id]: http(),
   },
 });
